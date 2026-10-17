@@ -2,17 +2,201 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>약연</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4FBF8">
+  <meta name="robots" content="noindex">
+  <title>약연 · 복약자 열람 동의</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <main class="container">
-    <h1>약연</h1>
-    <p>복약 관리 서비스를 위한 웹페이지입니다.</p>
-    <button id="testButton">테스트</button>
-    <p id="message"></p>
-  </main>
-  <script src="script.js"></script>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">약</span>
+        <div>
+          <p class="brand-name">약연</p>
+          <p class="brand-page">복약자 열람 동의</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="view-login" class="view" hidden>
+        <div class="intro">
+          <h1>로그인</h1>
+          <p>대리인에게 허용할 정보를 정해 주세요.</p>
+        </div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="login-id">아이디</label>
+            <input id="login-id" name="username" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="아이디를 입력해 주세요" maxlength="20">
+            <p class="field-msg" id="login-id-msg"></p>
+          </div>
+
+          <div class="field">
+            <label for="login-password">비밀번호</label>
+            <div class="field-box">
+              <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="비밀번호를 입력해 주세요" maxlength="64">
+              <button type="button" class="text-btn" data-toggle-password="login-password" aria-pressed="false">표시</button>
+            </div>
+            <p class="field-msg" id="login-password-msg"></p>
+          </div>
+
+          <p class="form-msg" id="login-form-msg"></p>
+          <button class="btn" type="submit">로그인</button>
+        </form>
+
+        <p class="switch-auth">
+          아직 계정이 없나요?
+          <a href="#/signup">회원가입</a>
+        </p>
+        <p class="fine">계정과 동의 내용은 이 브라우저에만 저장되며 서버로 전송되지 않습니다.</p>
+      </section>
+
+      <section id="view-signup" class="view" hidden>
+        <div class="intro">
+          <h1>회원가입</h1>
+          <p>본인 확인을 마치면, 로그인 후 대리인 열람 범위를 직접 정할 수 있어요.</p>
+        </div>
+
+        <form id="signup-form" novalidate>
+          <fieldset class="group">
+            <legend>본인</legend>
+
+            <div class="field">
+              <label for="signup-name">이름</label>
+              <input id="signup-name" name="name" type="text" autocomplete="name" placeholder="이름을 입력해 주세요" maxlength="20">
+              <p class="field-msg" id="signup-name-msg"></p>
+            </div>
+
+            <div class="field">
+              <label for="signup-phone">휴대폰 번호</label>
+              <div class="split">
+                <input id="signup-phone" name="tel" type="tel" autocomplete="tel" inputmode="numeric" placeholder="숫자만 입력해 주세요" maxlength="13">
+                <button type="button" class="btn btn-line" id="request-code">인증번호 받기</button>
+              </div>
+              <p class="field-msg" id="signup-phone-msg"></p>
+            </div>
+
+            <div class="field" id="code-field" hidden>
+              <label for="signup-code">인증번호</label>
+              <div class="split">
+                <input id="signup-code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="6자리" maxlength="6">
+                <button type="button" class="btn btn-line" id="confirm-code">확인</button>
+              </div>
+              <p class="demo-code" id="demo-code" hidden>화면 확인용 인증번호 <strong id="demo-code-value"></strong></p>
+              <p class="field-msg" id="signup-code-msg"></p>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>계정</legend>
+
+            <div class="field">
+              <label for="signup-id">아이디</label>
+              <div class="split">
+                <input id="signup-id" name="username" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="6~20자 영문, 숫자" maxlength="20">
+                <button type="button" class="btn btn-line" id="check-id">중복 확인</button>
+              </div>
+              <p class="field-msg" id="signup-id-msg"></p>
+            </div>
+
+            <div class="field">
+              <label for="signup-password">비밀번호</label>
+              <div class="field-box">
+                <input id="signup-password" name="new-password" type="password" autocomplete="new-password" placeholder="영문, 숫자, 특수문자 포함 8자 이상" maxlength="64">
+                <button type="button" class="text-btn" data-toggle-password="signup-password" aria-pressed="false">표시</button>
+              </div>
+              <ul class="rules" id="password-rules">
+                <li data-rule="length">8자 이상</li>
+                <li data-rule="letter">영문</li>
+                <li data-rule="digit">숫자</li>
+                <li data-rule="symbol">특수문자</li>
+              </ul>
+              <p class="field-msg" id="signup-password-msg"></p>
+            </div>
+
+            <div class="field">
+              <label for="signup-password-confirm">비밀번호 확인</label>
+              <div class="field-box">
+                <input id="signup-password-confirm" type="password" autocomplete="new-password" placeholder="비밀번호를 한 번 더 입력해 주세요" maxlength="64">
+                <button type="button" class="text-btn" data-toggle-password="signup-password-confirm" aria-pressed="false">표시</button>
+              </div>
+              <p class="field-msg" id="signup-password-confirm-msg"></p>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>대리인 연동</legend>
+
+            <div class="field">
+              <label for="signup-agent">대리인 앱 아이디</label>
+              <input id="signup-agent" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="대리인의 약연 아이디" maxlength="20">
+              <p class="hint">약연 앱에 가입한 대리인 아이디와 이 계정을 연결합니다.</p>
+              <p class="field-msg" id="signup-agent-msg"></p>
+            </div>
+
+            <div class="field">
+              <label for="signup-relation">대리인과의 관계</label>
+              <select id="signup-relation">
+                <option value="">관계를 선택해 주세요</option>
+                <option>자녀</option>
+                <option>배우자</option>
+                <option>부모</option>
+                <option>형제·자매</option>
+                <option>조부모</option>
+                <option>요양보호사</option>
+                <option>기타</option>
+              </select>
+              <p class="hint">안내에만 쓰이며, 열람 권한과는 별개입니다.</p>
+              <p class="field-msg" id="signup-relation-msg"></p>
+            </div>
+
+            <div class="field" id="relation-note-field" hidden>
+              <label for="signup-relation-note">관계 직접 입력</label>
+              <input id="signup-relation-note" type="text" placeholder="예: 사촌, 이웃" maxlength="20">
+              <p class="field-msg" id="signup-relation-note-msg"></p>
+            </div>
+          </fieldset>
+
+          <button class="btn" type="submit">가입하기</button>
+        </form>
+
+        <p class="switch-auth">
+          이미 계정이 있나요?
+          <a href="#/login">로그인</a>
+        </p>
+        <p class="fine">휴대폰 인증번호는 문자 대신 이 화면에 표시됩니다. 계정은 이 브라우저에만 남습니다.</p>
+      </section>
+
+      <section id="view-consent" class="view" hidden>
+        <div class="consent-head">
+          <div>
+            <h1 id="consent-title">열람 권한 범위</h1>
+            <p id="consent-who"></p>
+          </div>
+          <button type="button" class="btn btn-line btn-small" id="logout">로그아웃</button>
+        </div>
+        <p class="intro-copy">공유할 항목만 동의해 주세요. 비동의인 항목은 앱에서 아래 제한이 적용됩니다.</p>
+
+        <div id="consent-list"></div>
+
+        <section class="summary" id="summary" aria-live="polite">
+          <h2>적용되는 제한</h2>
+          <div id="summary-body"></div>
+        </section>
+
+        <div class="savebar">
+          <p class="savebar-note" id="save-note"></p>
+          <button type="button" class="btn" id="save-consent">열람 범위 저장</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="js/app.js"></script>
 </body>
 </html>
