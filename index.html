@@ -72,6 +72,13 @@
             </div>
 
             <div class="field">
+              <label for="signup-birth">생년월일</label>
+              <input id="signup-birth" name="bday" type="date" autocomplete="bday" min="1900-01-01">
+              <p class="hint">YYYY.MM.DD</p>
+              <p class="field-msg" id="signup-birth-msg"></p>
+            </div>
+
+            <div class="field">
               <label for="signup-phone">휴대폰 번호</label>
               <div class="split">
                 <input id="signup-phone" name="tel" type="tel" autocomplete="tel" inputmode="numeric" placeholder="숫자만 입력해 주세요" maxlength="13">

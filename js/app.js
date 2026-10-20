@@ -171,10 +171,17 @@ function bindLogin() {
 
 function bindSignup() {
   const phoneInput = document.getElementById("signup-phone");
+  const birthInput = document.getElementById("signup-birth");
   const idInput = document.getElementById("signup-id");
   const passwordInput = document.getElementById("signup-password");
   const confirmInput = document.getElementById("signup-password-confirm");
   const relation = document.getElementById("signup-relation");
+
+  birthInput.max = todayIso();
+  birthInput.addEventListener("input", () => {
+    clearMsg("signup-birth-msg");
+    birthInput.removeAttribute("aria-invalid");
+  });
 
   phoneInput.addEventListener("input", () => {
     const digits = digitsOnly(phoneInput.value);
@@ -308,6 +315,7 @@ function checkDuplicateId() {
 async function submitSignup(event) {
   event.preventDefault();
   const nameInput = document.getElementById("signup-name");
+  const birthInput = document.getElementById("signup-birth");
   const phoneInput = document.getElementById("signup-phone");
   const idInput = document.getElementById("signup-id");
   const passwordInput = document.getElementById("signup-password");
@@ -317,6 +325,7 @@ async function submitSignup(event) {
   const noteInput = document.getElementById("signup-relation-note");
 
   const name = nameInput.value.trim();
+  const birthDate = birthInput.value;
   const phone = digitsOnly(phoneInput.value);
   const id = idInput.value.trim();
   const password = passwordInput.value;
@@ -325,9 +334,9 @@ async function submitSignup(event) {
   const relationship = relation.value;
   const relationshipNote = noteInput.value.trim();
 
-  const fields = [nameInput, phoneInput, idInput, passwordInput, confirmInput, agentInput, relation, noteInput];
+  const fields = [nameInput, birthInput, phoneInput, idInput, passwordInput, confirmInput, agentInput, relation, noteInput];
   fields.forEach((field) => field.removeAttribute("aria-invalid"));
-  ["signup-name-msg", "signup-phone-msg", "signup-code-msg", "signup-id-msg", "signup-password-msg", "signup-password-confirm-msg", "signup-agent-msg", "signup-relation-msg", "signup-relation-note-msg"]
+  ["signup-name-msg", "signup-birth-msg", "signup-phone-msg", "signup-code-msg", "signup-id-msg", "signup-password-msg", "signup-password-confirm-msg", "signup-agent-msg", "signup-relation-msg", "signup-relation-note-msg"]
     .forEach(clearMsg);
 
   let firstInvalid = null;
@@ -338,6 +347,8 @@ async function submitSignup(event) {
   };
 
   if (!NAME_PATTERN.test(name)) fail(nameInput, "signup-name-msg", "이름은 한글 또는 영문 2~20자로 입력해 주세요.");
+  if (!birthDate) fail(birthInput, "signup-birth-msg", "생년월일을 선택해 주세요.");
+  else if (!isValidBirthDate(birthDate)) fail(birthInput, "signup-birth-msg", "생년월일을 확인해 주세요.");
   if (!isMobilePhone(phone)) fail(phoneInput, "signup-phone-msg", "휴대폰 번호를 확인해 주세요.");
   else if (verifiedPhone !== phone) fail(phoneInput, "signup-phone-msg", "휴대폰 인증을 마쳐 주세요.");
   if (!ID_PATTERN.test(id)) fail(idInput, "signup-id-msg", "6~20자의 영문과 숫자로 입력해 주세요.");
@@ -361,6 +372,7 @@ async function submitSignup(event) {
     salt,
     passwordHash: await hashPassword(password, salt),
     name,
+    birthDate: formatBirthDate(birthDate),
     phone,
     agentId,
     relationship,
@@ -686,6 +698,28 @@ function bindPasswordToggles(root) {
 
 function isMobilePhone(digits) {
   return /^01[016789]\d{7,8}$/.test(digits);
+}
+
+function todayIso() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
+function isValidBirthDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  if (year < 1900) return false;
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date <= today;
+}
+
+function formatBirthDate(value) {
+  return value.replaceAll("-", ".");
 }
 
 function isStrongPassword(password) {
